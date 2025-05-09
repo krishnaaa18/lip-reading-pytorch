@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 class LipReadingModel(nn.Module):
-    def __init__(self, num_classes, hidden_size=64):
+    def __init__(self, input_size=64, num_frames=763, hidden_size=256, num_classes=10):
         super(LipReadingModel, self).__init__()
 
         self.conv1 = nn.Conv2d(1, 16, kernel_size=3, padding=1)
@@ -11,9 +11,12 @@ class LipReadingModel(nn.Module):
         self.pool2 = nn.MaxPool2d(2, 2)
         self.conv3 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
         self.pool3 = nn.AdaptiveAvgPool2d((1, 1))  # final size: [batch, 64, 1, 1]
+        self.hidden_size = hidden_size
+        self.num_classes = num_classes
+        input_size = 64
+        num_frames = 763
 
-        self.lstm = nn.LSTM(input_size=64, hidden_size=hidden_size, num_layers=1, batch_first=True)
-
+        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size, num_layers=1, batch_first=True)
         self.fc = nn.Linear(hidden_size, num_classes)
 
     def forward(self, x):
@@ -32,5 +35,5 @@ class LipReadingModel(nn.Module):
         x, _ = self.lstm(x)  # [batch, time, hidden]
         x = x[:, -1, :]  # take last frame's output
 
-        out = self.fc(x)
-        return out
+        x = self.fc(x)
+        return x

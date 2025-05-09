@@ -21,7 +21,8 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 # Initialize model, loss, and optimizer
-model = LipReadingModel(num_classes=10, hidden_size=64).to(device)
+model = LipReadingModel(input_size=64, num_frames=763, hidden_size=256, num_classes=10)
+
  # Adjust num_classes
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
